@@ -88,3 +88,42 @@ Exchange (Message Router): The post office worker that sends messages to queues 
 Routing Key: A tag on the message that specifies which queue to send it to - an address that helps RabbitMQ send the message to the correct queue.
 Binding: The connection between Exchange and Queue - the process that determines which Queue to send messages from Exchange to.
 
+What is Classic Queue?
+✅ The default type of queues in RabbitMQ
+✅ Simple and widely used for most projects
+✅ Uses a master node to store messages
+✅ Fast performance, but less immune to message loss
+
+🔹 What is the problem with Classic Queue?
+❌ If the master node crashes, messages are lost!
+❌ Not suitable for projects with sensitive data.
+
+🛠 What projects is Classic Queue suitable for?
+✅ Simple systems with a RabbitMQ Server
+✅ Where losing some messages is not a problem
+For example: non-sensitive messaging systems, push notifications, and ad-hoc processing
+
+What is Quorum Queue?
+✅ Suitable for projects where messages should not be lost
+✅ Uses multiple nodes to store and backup messages
+✅ If a server crashes, data is not lost
+✅ Uses a consensus algorithm to synchronize data between nodes
+
+🔹 How does Quorum Queue protect messages?
+🔸 Each message is copied to multiple servers (Nodes)
+🔸 At least half of the nodes + 1 node must store the message
+For example, if we have 5 RabbitMQ servers, the message is stored on 3 servers.
+
+🛠 What projects is Quorum Queue suitable for?
+✅ Projects where messages should not be lost
+✅ Banking and financial systems 💰
+✅ Healthcare and medical services 🏥
+✅ Projects running in a Cluster environment
+
+Which one should we choose in real projects (Production)?
+✅ If data safety and message loss are important → Quorum Queue
+✅ If speed is more important than data safety and message loss is not a problem → Classic Queue
+✅ In this course, both types can be used, but for the real environment (Production), it is better to use Quorum Queue.
+
+
+
