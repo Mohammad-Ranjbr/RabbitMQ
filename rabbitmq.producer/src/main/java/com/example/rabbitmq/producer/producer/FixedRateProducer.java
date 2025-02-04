@@ -21,7 +21,7 @@ public class FixedRateProducer {
 
     // 🔹 This annotation is placed on a method so that the method is executed every 500 milliseconds (half a second).
     //🔹 The fixedRate value means how many milliseconds the method is executed, regardless of whether the previous execution has finished or not.
-    @Scheduled(fixedRate = 500)
+    //@Scheduled(fixedRate = 500)
     public void sendMessage(){
         i++;
         logger.info("i is : " + i);
