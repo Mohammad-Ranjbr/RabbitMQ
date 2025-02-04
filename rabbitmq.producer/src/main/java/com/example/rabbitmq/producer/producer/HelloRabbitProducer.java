@@ -15,6 +15,9 @@ public class HelloRabbitProducer {
     }
 
     public void sendHello(String name){
+         // convertAndSend :
+        //🔹 If your message is a String, Spring converts it to byte[].
+        //🔹 If the message is a Java object (Object), Spring uses a Message Converter and serializes it (JSON/XML or binary).
         String message = "Hello, " + name + "!";
         rabbitTemplate.convertAndSend("course.hello", message);
         System.out.println("Message send: " + message);
