@@ -1,0 +1,90 @@
+What is a messaging system?
+A messaging system is a mechanism for communication between applications (Application to Application or A2A). It manages messages between different applications and systems in an organization.
+
+An example of a messaging system in use
+Suppose a company has three systems:
+Human Resources System (HR System): Manages information about new employees and those who have resigned.
+Marketing System: Needs to receive employee information to manage its users.
+Active Directory: Used to store usernames and passwords.
+Without using a messaging system
+A new employee is registered in the HR system resources.
+The Marketing system must retrieve information from the HR database every hour and process it itself.
+The Active Directory system only receives and processes new data once a day (at 1 am).
+This method is that the transfer of information is delayed. Also, each system must be given different file methods (e.g. database, API, text) which adds complexity.
+
+Using RabbitMQ
+The HR system sends every change to RabbitMQ.
+RabbitMQ receives the message and puts it in a queue.
+The Market and Active Directory system receive and process both messages.
+In this method, data transfer is done in real-time and there is no need to implement different schedules in different systems.
+
+Major problems with old and important messaging system methods
+If the number of applications increases, each application communicates with a large number of other applications. If you have P source applications and Q target applications, you need to set up P × Q communication points which becomes very complicated.
+Different communication methods (database, API, file) have different formats which are difficult to manage.
+Direct communication may cause applications to crash.
+
+Using RabbitMQ, systems are decoupled, meaning that:
+The source system only sends to RabbitMQ.
+The target system receives what it needs from RabbitMQ.
+All systems communicate in a standard format (e.g. JSON).
+RabbitMQ can process large amounts of data quickly.
+
+Run the following command:
+docker run -d --name rabbitmq \
+  --restart unless-stopped \
+  -p 5672:5672 -p 15672:15672 \
+  -e RABBITMQ_DEFAULT_USER=admin \
+  -e RABBITMQ_DEFAULT_PASS=admin123 \
+  -v rabbitmq_data:/var/lib/rabbitmq \
+  rabbitmq:management
+
+unless-stopped: Restarts the container unless it has been manually stopped.
+always: Even if manually stopped, it will be restarted after a system restart, which is sometimes unnecessary.
+
+
+How does RabbitMQ work? A simple example
+Let's assume we have a specific post office:
+Person A logs into the post office and sends a message.
+The post office places this message in a specific queue.
+Person X has informed this post office that he is interested in messages from a specific queue.
+Now, whenever a new message arrives in this queue, the post office sends it to person X to process.
+
+What is Exchange and what does it do?
+Exchange acts like a post office employee who sends messages to the appropriate queues.
+When it receives a message, it must decide:
+Should it send the message to a specific queue?
+Should it send the message to several different queues?
+Should it delete the message altogether?
+
+🔹 If the message needs to be sent to multiple queues, Exchange places a copy of the message in each queue.
+Two important concepts: Message Durability and Queue Durability
+
+🔹 By default, RabbitMQ stores messages transiently.
+That is, if the RabbitMQ server is shut down or crashes, the messages are lost.
+Even the queue itself may be deleted unless we define it as Durable.
+
+✅ How to make messages and queues durable
+
+When we create a queue, we must define it as Durable so that it is not lost after the server is shut down.
+This causes the queue structure to be saved on disk and recreated after RabbitMQ is restarted.
+
+Creating a Persistent Message
+We must mark each message as Persistent when sending it so that RabbitMQ stores it on disk.
+We do this by setting Delivery Mode = Persistent.
+✅ If both the queue and the message are durable, RabbitMQ will try to preserve the messages even if the server is down or crashes.
+
+Simple summary:
+RabbitMQ is like a post office that manages messages.
+The Producer sends the message, the Exchange sends the message to the appropriate Queue, and the Consumer receives it.
+To prevent message loss, we need to make the queue and messages durable and persistent.
+
+Producer: Person A who sends the message - the application that sends the message to RabbitMQ.
+Message: The message sent - the information being sent (e.g. a JSON string).
+Queue: The queue where the message is placed - a place that holds messages until they are processed.
+Consumer: Person X who receives the message - the application that receives and processes messages from the queue.
+Subscribe: Person X registers with the post office - the process of expressing interest in receiving messages from a queue.
+Consume: Message received by person X - receiving and processing the message from the queue.
+Exchange (Message Router): The post office worker that sends messages to queues - the part that receives messages from the Producer and sends them to the appropriate queue.
+Routing Key: A tag on the message that specifies which queue to send it to - an address that helps RabbitMQ send the message to the correct queue.
+Binding: The connection between Exchange and Queue - the process that determines which Queue to send messages from Exchange to.
+
