@@ -125,5 +125,15 @@ Which one should we choose in real projects (Production)?
 ✅ If speed is more important than data safety and message loss is not a problem → Classic Queue
 ✅ In this course, both types can be used, but for the real environment (Production), it is better to use Quorum Queue.
 
+Why use JSON? 🤔
+RabbitMQ accepts any string as a message, which is very flexible. But this can cause problems.
+🔹 Problem: Different message formats
+Suppose we have two producers that send messages in different formats:
+Producer X separates its data with ||:
+Producer Y separates its data with ;:
+Now if a consumer (Consumer C) wants to receive these messages, it must know both formats and have different ways to process each format. This adds a lot of complexity to the code.
+🔹 Solution: Use JSON
+With JSON, all the data is in a standard format. This means that different producers do not need to use different ways to separate the data.
+
 
 
