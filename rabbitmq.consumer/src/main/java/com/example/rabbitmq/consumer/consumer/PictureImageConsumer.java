@@ -1,6 +1,6 @@
 package com.example.rabbitmq.consumer.consumer;
 
-import com.example.rabbitmq.consumer.model.Employee;
+import com.example.rabbitmq.consumer.model.Picture;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -10,20 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MarketingConsumer {
+public class PictureImageConsumer {
 
     private final ObjectMapper objectMapper;
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeJsonConsumer.class);
+    private final static Logger logger = LoggerFactory.getLogger(PictureImageConsumer.class);
 
     @Autowired
-    public MarketingConsumer(ObjectMapper objectMapper){
+    public PictureImageConsumer(ObjectMapper objectMapper){
         this.objectMapper = objectMapper;
     }
 
-//    @RabbitListener(queues = "q.hr.marketing")
-//    public void listen(String message) throws JsonProcessingException {
-//        Employee employee = objectMapper.readValue(message, Employee.class);
-//        logger.info("Employee in marketing : " + employee);
-//    }
+    @RabbitListener(queues = "q.picture.image")
+    public void listen(String message) throws JsonProcessingException {
+        Picture picture = objectMapper.readValue(message, Picture.class);
+        logger.info("Picture in image queue : " + picture);
+    }
 
 }

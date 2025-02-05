@@ -172,4 +172,30 @@ Both departments should receive a copy of the message!
 ✅ Fanout Exchange solves this problem and sends the message to all connected queues.
 📌 Fanout Exchange does not require a Routing Key, so leave it blank.
 
+🔍 What is Direct Exchange?
+✅ Direct Exchange allows you to selectively send messages to specific queues only.
+✅ In this model, messages have a Routing Key and Exchange sends the message only to the queue that exactly matches this Routing Key.
+📌 Simple example:
+In an image upload system, we have three types of images: PNG, JPEG and SVG.
+PNG and JPEG only need to generate Thumbnail.
+SVG needs to be converted to PNG first and then Thumbnail is generated.
+Here, we can create two different queues to process images:
+q.picture.image for PNG and JPEG images
+q.picture.vector for SVG images
+✅ With Direct Exchange, messages are sent to the appropriate queue based on the Routing Key.
+
+We create a Direct Exchange called x.picture.
+We create two queues to receive messages:
+q.picture.image → for PNG and JPEG
+q.picture.vector → for SVG
+We create a producer that sends messages to x.picture.
+We create two consumers that receive PNG and JPEG messages from q.picture.image and SVG messages from q.picture.vector.
+
+q.picture.image → connected to x.picture with Routing Key jpeg
+q.picture.image → connected to x.picture with Routing Key png
+q.picture.vector → connected to x.picture with Routing Key svg
+📌 Now if a message is sent with Routing Key jpeg or png, it goes to q.picture.image.
+📌 If a message is sent with Routing Key svg, it goes to q.picture.vector.
+📌 If a message is sent with another Routing Key, it is not placed in any queue and is deleted!
+
 

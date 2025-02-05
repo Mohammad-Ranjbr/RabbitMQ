@@ -20,10 +20,10 @@ public class AccountingConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = "q.hr.accounting")
-    public void listen(String message) throws JsonProcessingException {
-        Employee employee = objectMapper.readValue(message, Employee.class);
-        logger.info("Employee in accounting : " + employee);
-    }
+//    @RabbitListener(queues = "q.hr.accounting")
+//    public void listen(String message) throws JsonProcessingException {
+//        Employee employee = objectMapper.readValue(message, Employee.class);
+//        logger.info("Employee in accounting : " + employee);
+//    }
 
 }

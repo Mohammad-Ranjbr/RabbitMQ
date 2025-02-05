@@ -9,6 +9,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Employee {
 
     @JsonProperty("employee_id")
@@ -18,11 +20,5 @@ public class Employee {
     @JsonProperty("birth_date")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
-
-    public Employee(String id, String name, LocalDate birthDate) {
-        this.id = id;
-        this.name = name;
-        this.birthDate = birthDate;
-    }
 
 }
