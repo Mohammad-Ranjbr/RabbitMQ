@@ -20,10 +20,10 @@ public class PictureImageConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = "q.picture.image")
-    public void listen(String message) throws JsonProcessingException {
-        Picture picture = objectMapper.readValue(message, Picture.class);
-        logger.info("Picture in image queue : " + picture);
-    }
+//    @RabbitListener(queues = "q.picture.image")
+//    public void listen(String message) throws JsonProcessingException {
+//        Picture picture = objectMapper.readValue(message, Picture.class);
+//        logger.info("Picture in image queue : " + picture);
+//    }
 
 }

@@ -1,11 +1,7 @@
 package com.example.rabbitmq.producer;
 
-import com.example.rabbitmq.producer.model.Employee;
 import com.example.rabbitmq.producer.model.Picture;
-import com.example.rabbitmq.producer.producer.EmployeeJsonProducer;
-import com.example.rabbitmq.producer.producer.HelloRabbitProducer;
-import com.example.rabbitmq.producer.producer.HumanResourceProducer;
-import com.example.rabbitmq.producer.producer.PictureProducer;
+import com.example.rabbitmq.producer.producer.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -13,7 +9,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -33,15 +28,17 @@ public class Application implements CommandLineRunner {
 	private final HelloRabbitProducer helloRabbitProducer;
 	private final EmployeeJsonProducer employeeJsonProducer;
 	private final HumanResourceProducer humanResourceProducer;
-	private final PictureProducer pictureProducer;
+	private final DirectExchangePictureProducer pictureProducer;
+	private final TopicExchangePictureProducer pictureProducerTwo;
 
 	@Autowired
 	public Application(HelloRabbitProducer helloRabbitProducer, EmployeeJsonProducer employeeJsonProducer,
-					   HumanResourceProducer humanResourceProducer, PictureProducer pictureProducer){
+					   HumanResourceProducer humanResourceProducer, DirectExchangePictureProducer pictureProducer, TopicExchangePictureProducer pictureProducerTwo){
 		this.helloRabbitProducer = helloRabbitProducer;
 		this.employeeJsonProducer = employeeJsonProducer;
 		this.humanResourceProducer = humanResourceProducer;
 		this.pictureProducer = pictureProducer;
+		this.pictureProducerTwo = pictureProducerTwo;
 	}
 
 	@Override
@@ -60,18 +57,31 @@ public class Application implements CommandLineRunner {
 		//humanResourceProducer.sendMessage(new Employee("104", "Mina", LocalDate.of(1995, 12, 5)));
 		//humanResourceProducer.sendMessage(new Employee("105", "Amir", LocalDate.of(1988, 7, 25)));
 
-		List<String> sources = Arrays.asList("mobile", "web");
-        List<String> types = Arrays.asList("jpg", "png", "svg");
+		//List<String> sources = Arrays.asList("mobile", "web");
+        //List<String> types = Arrays.asList("jpg", "png", "svg");
 
-        for (int i = 1; i <= 10; i++) {
-            Picture picture = new Picture(
-                "image-" + i,
-                types.get(new Random().nextInt(types.size())),
-                sources.get(new Random().nextInt(sources.size())),
-                new Random().nextInt(10000)
-            );
-			pictureProducer.sendMessage(picture);
-        }
+        //for (int i = 1; i <= 10; i++) {
+            //Picture picture = new Picture(
+                //"image-" + i,
+                //types.get(new Random().nextInt(types.size())),
+                //sources.get(new Random().nextInt(sources.size())),
+                //new Random().nextInt(10000)
+            //);
+			//pictureProducer.sendMessage(picture);
+        //}
+
+		List<String> sources = Arrays.asList("mobile", "web");
+		List<String> types = Arrays.asList("jpg", "png", "svg");
+
+		for (int i = 1; i <= 10; i++) {
+			Picture picture = new Picture(
+					"image-" + i,
+					types.get(new Random().nextInt(types.size())),
+					sources.get(new Random().nextInt(sources.size())),
+					new Random().nextInt(10000)
+			);
+			pictureProducerTwo.sendMessage(picture);
+		}
 
 	}
 

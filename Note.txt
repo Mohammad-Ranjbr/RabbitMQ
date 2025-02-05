@@ -198,4 +198,36 @@ q.picture.vector → connected to x.picture with Routing Key svg
 📌 If a message is sent with Routing Key svg, it goes to q.picture.vector.
 📌 If a message is sent with another Routing Key, it is not placed in any queue and is deleted!
 
+We want to route messages based on multiple criteria. For this, we use Topic Exchange.
+🎯 Scenario: Processing images with multiple criteria
+We have a system that processes images. Things to do:
+✅ Create thumbnails and publish images (as before).
+✅ Convert SVG (vector) files to images.
+✅ Apply filters to images sent from mobile.
+✅ Create reports for large vectors (more than 4000 units of volume).
+
+Here we need to route messages to different queues based on 3 properties:
+
+Image source: from mobile or web.
+
+Image size: small or large.
+
+File type: jpeg, png or svg.
+🛠 Using Topic Exchange
+In Topic Exchange, the routing key consists of 3 parts, which are . Separated
+To send messages to the appropriate queues, we use special patterns (wildcards) in routing:
+* matches exactly one word.
+# matches zero or more words.
+
+📌 Example:
+The message mobile.large.png goes to 3 queues:
+queue.picture.image (because it has a png type).
+queue.picture.filter (because it was sent from mobile).
+But it doesn't go to queue.picture.log because it's not a svg type.
+The message web.small.svg only goes to queue.picture.vector.
+The message mobile.large.svg goes to 3 queues:
+queue.picture.vector (because it's a svg).
+queue.picture.filter (because it was sent from mobile).
+queue.picture.log (because it's a large and a svg).
+
 

@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PictureProducer {
+public class DirectExchangePictureProducer {
 
     private final ObjectMapper objectMapper;
     private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public PictureProducer(ObjectMapper objectMapper, RabbitTemplate rabbitTemplate){
+    public DirectExchangePictureProducer(ObjectMapper objectMapper, RabbitTemplate rabbitTemplate){
         this.objectMapper = objectMapper;
         this.rabbitTemplate = rabbitTemplate;
     }
