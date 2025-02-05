@@ -10,20 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmployeeJsonConsumer {
+public class MarketingConsumer {
 
     private final ObjectMapper objectMapper;
     private static final Logger logger = LoggerFactory.getLogger(EmployeeJsonConsumer.class);
 
     @Autowired
-    public EmployeeJsonConsumer(ObjectMapper objectMapper){
+    public MarketingConsumer(ObjectMapper objectMapper){
         this.objectMapper = objectMapper;
     }
 
-//    @RabbitListener(queues = "course.employee")
-//    public void listen(String message) throws JsonProcessingException {
-//        Employee employee = objectMapper.readValue(message, Employee.class);
-//        logger.info("Employee is : " + employee);
-//    }
+    @RabbitListener(queues = "q.hr.marketing")
+    public void listen(String message) throws JsonProcessingException {
+        Employee employee = objectMapper.readValue(message, Employee.class);
+        logger.info("Employee in marketing : " + employee);
+    }
 
 }
