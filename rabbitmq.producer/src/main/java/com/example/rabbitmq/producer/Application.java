@@ -1,5 +1,6 @@
 package com.example.rabbitmq.producer;
 
+import com.example.rabbitmq.producer.model.Furniture;
 import com.example.rabbitmq.producer.model.Picture;
 import com.example.rabbitmq.producer.producer.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,17 +32,19 @@ public class Application implements CommandLineRunner {
 	private final DirectExchangePictureProducer pictureProducer;
 	private final TopicExchangePictureProducer pictureProducerTwo;
 	private final MyPictureProducer myPictureProducer;
+	private final FurnitureProducer furnitureProducer;
 
 	@Autowired
 	public Application(HelloRabbitProducer helloRabbitProducer, EmployeeJsonProducer employeeJsonProducer,
 					   HumanResourceProducer humanResourceProducer, DirectExchangePictureProducer pictureProducer, TopicExchangePictureProducer pictureProducerTwo,
-			     MyPictureProducer myPictureProducer){
+			     MyPictureProducer myPictureProducer, FurnitureProducer furnitureProducer){
 		this.helloRabbitProducer = helloRabbitProducer;
 		this.employeeJsonProducer = employeeJsonProducer;
 		this.humanResourceProducer = humanResourceProducer;
 		this.pictureProducer = pictureProducer;
 		this.pictureProducerTwo = pictureProducerTwo;
 		this.myPictureProducer = myPictureProducer;
+		this.furnitureProducer = furnitureProducer;
 	}
 
 	@Override
@@ -86,17 +89,30 @@ public class Application implements CommandLineRunner {
 			//pictureProducerTwo.sendMessage(picture);
 		//}
 
-		List<String> sources = Arrays.asList("mobile", "web");
-		List<String> types = Arrays.asList("jpg", "png", "svg");
+		//List<String> sources = Arrays.asList("mobile", "web");
+		//List<String> types = Arrays.asList("jpg", "png", "svg");
 
-		for (int i = 1; i <= 1; i++) {
-			Picture picture = new Picture(
-					"image-" + i,
-					types.get(new Random().nextInt(types.size())),
-					sources.get(new Random().nextInt(sources.size())),
-					new Random().nextInt(9001,10000)
+		//for (int i = 1; i <= 1; i++) {
+			//Picture picture = new Picture(
+					//"image-" + i,
+					//types.get(new Random().nextInt(types.size())),
+					//sources.get(new Random().nextInt(sources.size())),
+					//new Random().nextInt(9001,10000)
+			//);
+			//myPictureProducer.sendMessage(picture);
+		//}
+
+		List<String> colors = Arrays.asList("red", "white", "green");
+		List<String> materials = Arrays.asList("wood", "plastic", "steel");
+
+		for (int i = 1; i <= 10; i++) {
+			Furniture furniture = new Furniture(
+					"Furniture-" + i,
+					colors.get(new Random().nextInt(colors.size())),
+					materials.get(new Random().nextInt(materials.size())),
+					new Random().nextInt(10000,100000)
 			);
-			myPictureProducer.sendMessage(picture);
+			furnitureProducer.sendMessage(furniture);
 		}
 
 	}

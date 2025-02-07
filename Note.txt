@@ -393,4 +393,26 @@ One on queue.mypicture.image-ttl
 ✅ The message in queue.mypicture.image-ttl is deleted and sent to x.mypicture.dlx.
 ✅ But the message remains in queue.mypicture.image, because it does not have a TTL!
 
+In RabbitMQ, there are different methods for routing messages. Headers Exchange is one of them, which uses message headers for routing instead of routing keys.
+🔹 In Headers Exchange, instead of Routing Key, we put information in Message Headers that specifies which queue the message should go to.
+🔹 This method is great for situations where you need to filter messages based on several different criteria.
+
+🎯 Scenario:
+A furniture store decides to run two types of Christmas promotions:
+1️⃣ "Special discount" only for white wooden or red metal furniture
+2️⃣ "Free shipping" for any furniture that is wooden or red
+
+1️⃣ Creating Exchanges and Queues in RabbitMQ
+🔹 We create a Headers Exchange called x.promotion.
+🔹 We create two Queues:
+✅ queue.promotion.discount → for special discounts
+✅ queue.promotion.free_delivery → for free shipping
+
+🔹 Now we add Headers Binding:
+✅ queue.promotion.discount will only receive messages if color=white AND material=wood or color=red AND material=steel.
+✅ queue.promotion.free_delivery will only receive messages if color=red OR material=wood.
+
+⏳ xmatch=all (default) All defined headers must be present in the message and their values must match.
+⏳ xmatch=any means only one of the conditions is sufficient.
+
 
