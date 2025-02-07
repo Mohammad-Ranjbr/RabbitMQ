@@ -230,4 +230,92 @@ queue.picture.vector (because it's a svg).
 queue.picture.filter (because it was sent from mobile).
 queue.picture.log (because it's a large and a svg).
 
+❌ Problem: Messages that always have errors
+Example: In the previous scenario, we were processing images. Now suppose an image is too large and causes an error in the Consumer.
+
+🔹 Spring Boot default behavior:
+If the Consumer gets an error while processing the message, RabbitMQ will put the message back in the Queue to be processed later.
+
+🔹 But what is the problem?
+If the message always causes an error (e.g. the image is too large and it throws an error every time it is processed), RabbitMQ will send the message over and over again, creating an infinite loop. 😱
+
+🔄 Solution: Dead Letter Exchange (DLX)
+🔹 If a message is processed multiple times and still has an error, we send it to a special queue called Dead Letter Queue (DLQ).
+🔹 This queue stores problematic messages to be reviewed later.
+🔹 We can write a separate Consumer to process these messages, for example:
+
+Send the message to the system administrator.
+
+Store the message in a database for further review.
+
+🎯 How does DLX work?
+✅ 1. The message is entered into the main Queue (e.g. q.picture.processing).
+✅ 2. If the processing was successful, the message is deleted.
+✅ 3. If the message has an error and is retried several times, RabbitMQ sends it to a Dead Letter Exchange (DLX).
+✅ 4. The DLX stores the message in the Dead Letter Queue (DLQ).
+✅ 5. Another Consumer can process these problematic messages.
+
+📌 How to store messages in RabbitMQ
+1️⃣ Memory-Only Queues
+
+By default, if your queue is not durable, messages are stored only in memory.
+These types of queues are faster, but if RabbitMQ crashes or restarts, messages are lost.
+2️⃣ Persistent Messages
+
+If you make the queue durable and send the message Persistent, the message is stored on disk.
+In this case, if RabbitMQ is restarted, the messages are not lost.
+
+📌 Are all messages always in memory?
+🔹 RabbitMQ stores messages in memory (RAM) first to speed up processing.
+🔹 If memory is full, RabbitMQ moves old messages to disk to free up memory space.
+🔹 This process is called Lazy Queue, which reduces RAM usage.
+
+📌 Differences between RabbitMQ and Kafka in message storage
+RabbitMQ Kafka feature
+Queue type
+RabbitMQ : Queue-based (messages are sent to one or more consumers and deleted)
+Kafka : Log-based (messages are stored in the log and consumers only advance one offset)
+
+Retention time
+RabbitMQ : By default, the message is destroyed after the consumer receives it unless Dead Letter Queue (DLQ) is configured
+Kafka : Messages are stored in the log for a specified period of time (e.g. 7 days), even after the consumer receives it
+
+Disk storage
+RabbitMQ : If the queue is Durable and a Persistent message is sent, the message is stored on disk. But when it is consumed, it is deleted.
+Kafka : All messages are stored on disk by default and are not deleted until the TTL or disk space limit is reached
+
+Processing model
+RabbitMQ : Push-based (messages are sent to the consumer)
+Kafka : Pull-based (consumers themselves receive messages from Kafka)
+
+Main use
+RabbitMQ : Suitable for distributed systems that require real-time messaging
+Kafka : Suitable for processing large volumes of data and streaming
+
+⏳ What is TTL (Time To Live) in RabbitMQ?
+TTL in RabbitMQ means that a message will only remain in the queue for a certain period of time and if it is not consumed within this period, it will be deleted or sent to the Dead Letter Exchange (DLX).
+
+📌 How does TTL work?
+Each message can have a TTL.
+🔹 This means that, for example, a message can remain in the queue for a maximum of 30 seconds.
+
+Each queue can also have a TTL.
+🔹 This means that all messages in a queue should not remain in it for more than 60 seconds.
+
+If the TTL expires:
+✅ If the queue has a Dead Letter Exchange (DLX), the message is sent there.
+❌ If DLX is not set, the message is deleted.
+
+📌 Why is TTL important?
+🔹 Managing old messages: If messages become old and are not processed, we delete them or move them to DLX.
+🔹 Create a Retry mechanism: Failed messages can be retried with a specified delay.
+🔹 Reduce system pressure: Removing old messages from the queue makes RabbitMQ work faster.
+
+📌 TTL + Dead Letter Exchange (DLX) = Retry mechanism
+If a consumer does not receive a message or rejects it due to an error, a retry mechanism can be built with the help of DLX and TTL:
+The message is placed in the Main Queue.
+If it is not consumed, it is sent to the Dead Letter Queue (DLQ) after the TTL.
+The consumer reads the message from the DLQ and retransmits it.
+This cycle can be repeated for several times.
+
 
