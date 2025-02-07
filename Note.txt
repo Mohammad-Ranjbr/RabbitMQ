@@ -349,7 +349,48 @@ AMQP and RabbitMQ are different!
 AMQP is a standard protocol.
 RabbitMQ is a Message Broker that supports AMQP.
 
+📌 Difference between two error handling methods in RabbitMQ
+When a consumer in RabbitMQ receives a message, there are two ways to handle the error:
 
+1️⃣ Automatically reject the message with AmqpRejectAndDontRequeueException
+2️⃣ Manually reject the message with channel.basicReject
 
+1️⃣ Automatically reject with AmqpRejectAndDontRequeueException
+🔹 In this method, if an error occurs, an exception is thrown.
+🔹 This exception tells Spring not to requeue the message.
+🔹 If Dead Letter Exchange (DLX) is configured, the message is moved to the Dead Letter Queue.
+✅ Advantage: We don't need to write any additional code, because Spring handles it itself.
+
+2️⃣ Manually reject the message with channel.basicReject
+🔹 In this method, we have to manually reject the message (basicReject).
+🔹 We also need to manually acknowledge the processed messages (basicAck).
+🔹 If we forget to acknowledge the message, the message will be put back in the queue and every time the consumer runs, the same message will be processed again (infinite loop).
+✅ Advantage: More flexibility
+⚠ Problem: If we forget to acknowledge, the message will be processed infinitely!
+
+How do TTL (Time to Live) and Dead Letter Exchange (Dead Letter Exchange) work?
+We have a Primary Exchange that receives messages and a Dead Letter Exchange (DLX) to handle dead messages.
+
+🛠 Implementation Steps:
+1️⃣ Create Exchanges and Queues
+🔹 We create a Fanout Exchange called x.mypicture (for the main processing).
+🔹 We create a Dead Letter Exchange (DLX) called x.mypicture.dlx.
+🔹 We create two Queues:
+✅ queue.mypicture.image (the main queue for messages)
+✅ queue.mypicture.image-ttl (this queue limits the message time to live)
+⏳ In queue.mypicture.image-ttl, we set the TTL value to 5000 milliseconds (5 seconds).
+📌 That is, if no consumer processes the message, after 5 seconds the message is forwarded to DLX.
+🔹 Now we connect these queues to Exchanges:
+✅ x.mypicture → queue.mypicture.image and queue.mypicture.image-ttl
+✅ x.mypicture.dlx → queue.mypicture.tlx (invalid message queue)
+
+Now we run the message producer (Producer), but we do not run the consumer (Consumer).
+🔹 We publish two messages:
+One on queue.mypicture.image
+One on queue.mypicture.image-ttl
+❌ Since the consumer is not running, the messages are not processed.
+⏳ After 5 seconds:
+✅ The message in queue.mypicture.image-ttl is deleted and sent to x.mypicture.dlx.
+✅ But the message remains in queue.mypicture.image, because it does not have a TTL!
 
 
