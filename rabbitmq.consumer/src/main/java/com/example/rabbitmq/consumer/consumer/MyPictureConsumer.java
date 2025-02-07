@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class MyPictureConsumer {
         String jsonString = new String(message.getBody());
         Picture picture = objectMapper.readValue(jsonString, Picture.class);
         if(picture.getSize() > 9000){
-            throw new IllegalArgumentException("Image size too large : " + picture);
+            throw new AmqpRejectAndDontRequeueException("Image size too large : " + picture);
         }
         logger.info("Processing image {}", picture);
     }
