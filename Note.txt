@@ -318,4 +318,38 @@ If it is not consumed, it is sent to the Dead Letter Queue (DLQ) after the TTL.
 The consumer reads the message from the DLQ and retransmits it.
 This cycle can be repeated for several times.
 
+📌 Scenario: Handling Invalid Messages with DLX
+✅ Problem:
+🔹 We have an image processing system that receives and processes images.
+🔹 If the image is more than 9000 bytes, the Consumer throws an error and RabbitMQ re-queues it.
+🔹 This process continues indefinitely, causing the message to get stuck in an infinite loop.
+
+✅ Solution:
+🔹 To avoid this problem, we use Dead Letter Exchange (DLX).
+🔹 When a consumer fails to process a message, RabbitMQ sends it to the Dead Letter Queue (DLQ).
+🔹 Another consumer receives messages from the DLQ and handles the invalid messages.
+
+What is AmqpRejectAndDontRequeueException in RabbitMQ?
+In Spring AMQP, when a consumer encounters an error while processing a message, it will requeue the message by default to requeue it.
+But in some cases, we don't want the message to be requested, because it will always cause an error (for example, the message format is wrong or the image size is too large).
+🔹 In these situations, we can throw an exception (AmqpRejectAndDontRequeueException).
+🔹 This exception causes the message to not be requested and go to the Dead Letter Exchange (DLX) (if DLX is configured).
+
+What is AMQP?
+🔹 AMQP (Advanced Message Queuing Protocol) is a standard and open-source protocol for sending and receiving messages between different systems.
+🔹 This protocol helps manage message queues and ensures that messages are processed without loss and in the correct order.
+
+📌 What is the AMQP architecture?
+AMQP consists of three main parts:
+1️⃣ Producer → Sends messages to an Exchange.
+2️⃣ Exchange → Processes messages and sends them to different Queues based on rules.
+3️⃣ Consumer → Receives and processes messages from the Queue.
+📌 Note:
+AMQP and RabbitMQ are different!
+AMQP is a standard protocol.
+RabbitMQ is a Message Broker that supports AMQP.
+
+
+
+
 
