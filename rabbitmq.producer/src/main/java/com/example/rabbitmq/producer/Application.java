@@ -4,6 +4,7 @@ import com.example.rabbitmq.producer.model.Furniture;
 import com.example.rabbitmq.producer.model.Picture;
 import com.example.rabbitmq.producer.producer.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +17,7 @@ import java.util.Random;
 
 @EnableScheduling
 @SpringBootApplication
+@RequiredArgsConstructor
 public class Application implements CommandLineRunner {
 
 	// What is @EnableScheduling?
@@ -33,19 +35,7 @@ public class Application implements CommandLineRunner {
 	private final TopicExchangePictureProducer pictureProducerTwo;
 	private final MyPictureProducer myPictureProducer;
 	private final FurnitureProducer furnitureProducer;
-
-	@Autowired
-	public Application(HelloRabbitProducer helloRabbitProducer, EmployeeJsonProducer employeeJsonProducer,
-					   HumanResourceProducer humanResourceProducer, DirectExchangePictureProducer pictureProducer, TopicExchangePictureProducer pictureProducerTwo,
-			     MyPictureProducer myPictureProducer, FurnitureProducer furnitureProducer){
-		this.helloRabbitProducer = helloRabbitProducer;
-		this.employeeJsonProducer = employeeJsonProducer;
-		this.humanResourceProducer = humanResourceProducer;
-		this.pictureProducer = pictureProducer;
-		this.pictureProducerTwo = pictureProducerTwo;
-		this.myPictureProducer = myPictureProducer;
-		this.furnitureProducer = furnitureProducer;
-	}
+	private final DirectExchangeRetryPictureProducer directExchangeRetryPictureProducer;
 
 	@Override
 	public void run(String... args) throws JsonProcessingException {
@@ -102,17 +92,30 @@ public class Application implements CommandLineRunner {
 			//myPictureProducer.sendMessage(picture);
 		//}
 
-		List<String> colors = Arrays.asList("red", "white", "green");
-		List<String> materials = Arrays.asList("wood", "plastic", "steel");
+		//List<String> colors = Arrays.asList("red", "white", "green");
+		//List<String> materials = Arrays.asList("wood", "plastic", "steel");
+
+		//for (int i = 1; i <= 10; i++) {
+			//Furniture furniture = new Furniture(
+					//"Furniture-" + i,
+					//colors.get(new Random().nextInt(colors.size())),
+					//materials.get(new Random().nextInt(materials.size())),
+					//new Random().nextInt(10000,100000)
+			//);
+			//furnitureProducer.sendMessage(furniture);
+		//}
+
+		List<String> sources = Arrays.asList("mobile", "web");
+		List<String> types = Arrays.asList("jpg", "png", "svg");
 
 		for (int i = 1; i <= 10; i++) {
-			Furniture furniture = new Furniture(
-					"Furniture-" + i,
-					colors.get(new Random().nextInt(colors.size())),
-					materials.get(new Random().nextInt(materials.size())),
-					new Random().nextInt(10000,100000)
+			Picture picture = new Picture(
+					"image-" + i,
+					types.get(new Random().nextInt(types.size())),
+					 sources.get(new Random().nextInt(sources.size())),
+					new Random().nextInt(10000)
 			);
-			furnitureProducer.sendMessage(furniture);
+			directExchangeRetryPictureProducer.sendMessage(picture);
 		}
 
 	}

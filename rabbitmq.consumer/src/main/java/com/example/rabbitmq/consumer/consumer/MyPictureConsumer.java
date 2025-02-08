@@ -33,7 +33,7 @@ public class MyPictureConsumer {
     //🔹 We also manually acknowledge valid messages (basicAck).
     //🔹 To do this, we need to add two parameters channel and deliveryTag to the consumer method.
 
-    @RabbitListener(queues = "q.mypicture.image")
+    //@RabbitListener(queues = "q.mypicture.image")
     public void listen(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         // 🔹 Message message → The message received from RabbitMQ (received as bytes).
         //🔹 Channel channel → Used to handle the confirmation, rejection, or rollback of a message in RabbitMQ.

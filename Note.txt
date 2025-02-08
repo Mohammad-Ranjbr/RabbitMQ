@@ -415,4 +415,26 @@ A furniture store decides to run two types of Christmas promotions:
 ⏳ xmatch=all (default) All defined headers must be present in the message and their values must match.
 ⏳ xmatch=any means only one of the conditions is sufficient.
 
+💡 Problem:
+Suppose we have an image publishing service on our website.
+✅ If this service is active, it publishes the image.
+❌ However, during times of high traffic, this service may be temporarily unavailable.
+
+In this situation, the two previous approaches we learned are not enough:
+1️⃣ Requeue: The message is requeued, but if the service is always down, the message will be processed infinitely!
+2️⃣ Send directly to the Dead Letter Exchange: The message is immediately sent to the problematic message queue, while the service may be available again after a few seconds.
+
+🚀 Solution: Combining Retry and Dead Letter Exchange
+✅ Try the message a number of times (N times).
+✅ If the service is still unavailable after N times, send the message to the Dead Letter Exchange to notify the system administrator.
+
+💡 Practical example
+🔹 We want to wait 30 seconds and process the message again.
+🔹 We do this 3 times.
+🔹 If there is still an error after 3 attempts, we send the message to the Dead Letter Exchange.
+
+🔧 To do this:
+We create a special Retry queue that holds the message for 30 seconds.
+If the error is not fixed after 3 attempts, we send the message to the Dead Letter Exchange.
+
 
