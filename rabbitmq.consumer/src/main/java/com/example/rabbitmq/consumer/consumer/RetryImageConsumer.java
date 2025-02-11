@@ -1,7 +1,11 @@
 package com.example.rabbitmq.consumer.consumer;
+
 import java.io.IOException;
 
 import com.example.rabbitmq.consumer.model.Picture;
+import com.example.rabbitmq.consumer.rabbitmq.DlxProcessingErrorHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -10,29 +14,21 @@ import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class RetryImageConsumer {
 
-    private static final String DEAD_EXCHANGE_NAME = "x.guideline.dead";
-
     private final ObjectMapper objectMapper;
-    private static final Logger LOG = LoggerFactory.getLogger(RetryImageConsumer.class);
-    private DlxProcessingErrorHandler dlxProcessingErrorHandler;
-
-    @Autowired
-    public RetryImageConsumer(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+    private final DlxProcessingErrorHandler dlxProcessingErrorHandler = new DlxProcessingErrorHandler(DEAD_EXCHANGE_NAME);
+    private static final String DEAD_EXCHANGE_NAME = "x.guideline.dead";
+    private static final Logger logger = LoggerFactory.getLogger(RetryImageConsumer.class);
 
     @RabbitListener(queues = "q.guideline.image.work")
     public void listen(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag)
-            throws InterruptedException, JsonParseException, JsonMappingException, IOException {
+            throws InterruptedException, IOException {
         try {
             var p = objectMapper.readValue(message.getBody(), Picture.class);
             // process the image
@@ -40,12 +36,12 @@ public class RetryImageConsumer {
                 // throw exception, we will use DLX handler for retry mechanism
                 throw new IOException("Size too large");
             } else {
-                LOG.info("Creating thumbnail & publishing : " + p);
+                logger.info("Creating thumbnail & publishing : " + p);
                 // you must acknowledge that message already processed
-                channel.basicAck(deliveryTag, false);
+                channel.basicAck(deliveryTag, false); // The message is acknowledged (ACK) → meaning RabbitMQ deletes this message.
             }
         } catch (IOException e) {
-            LOG.warn("Error processing message : " + new String(message.getBody()) + " : " + e.getMessage());
+            logger.warn("Error processing message : " + new String(message.getBody()) + " : " + e.getMessage());
             dlxProcessingErrorHandler.handleErrorProcessingMessage(message, channel, deliveryTag);
         }
     }

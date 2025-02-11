@@ -1,8 +1,26 @@
 package com.example.rabbitmq.consumer.rabbitmq;
 
-import java.util.*;
+import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Getter
 public class RabbitmqHeader {
+
+    // The RabbitmqHeader code manages information related to the header of RabbitMQ messages, specifically for the Retry and Dead Letter mechanisms.
+
+    // KEYWORD_QUEUE_WAIT → To identify the "wait" queue that is specific to Retry.
+    // KEYWORD_QUEUE_WAIT → This constant is used to identify the queues related to Retry (wait queue).
+    // Because in the Delayed Retry strategy, failed messages are first sent to a "wait queue" and after some time they are returned to the main queue.
+    // xDeaths → List of message death history (Dead Letter History) read from the x-death header.
+
+    // RabbitMQ usually keeps a maximum of two values in x-death (last time message died + first time message died).
+    // In ArrayList, if the initial capacity is too small, when adding more data, the capacity of the list doubles, which causes additional processing and memory allocation overhead.
+    // It optimizes memory and prevents repeated capacity increases.
 
     private static final String KEYWORD_QUEUE_WAIT = "wait";
     private List<RabbitmqHeaderXDeath> xDeaths = new ArrayList<>(2);
@@ -10,8 +28,24 @@ public class RabbitmqHeader {
     private String xFirstDeathQueue = "";
     private String xFirstDeathReason = "";
 
+    // In RabbitMQ, every time a message is sent to DLX, information about it is stored in the x-death header. This information includes:
+    // reason → reason for the message death (reject, ttl, max-length, etc.)
+    // count → number of times the message has been placed in DLX.
+    // exchange and queue → message routing.
+    // routingKeys → message routing keys.
+    // time → time spent in DLX.
+    // These values are stored in a RabbitmqHeaderXDeath object and added to the xDeaths list.
+
     @SuppressWarnings("unchecked")
     public RabbitmqHeader(Map<String, Object> headers) {
+
+        // Why is this information read from headers?
+        // In RabbitMQ, when a message is sent to the Dead Letter Exchange (DLX), a series of special headers are added to it:
+        // x-first-death-exchange → The first Exchange that sent the message to the DLX.
+        // x-first-death-queue → The first Queue in which the message died.
+        // x-first-death-reason → The reason the message died the first time (e.g. TTL or Reject).
+        // Purpose? Identify the root cause of the problem: If a message fails multiple times, we look for the first reason for its death.
+
         if (headers != null) {
             var xFirstDeathExchange = Optional.ofNullable(headers.get("x-first-death-exchange"));
             var xFirstDeathQueue = Optional.ofNullable(headers.get("x-first-death-queue"));
@@ -39,7 +73,7 @@ public class RabbitmqHeader {
                     queue.ifPresent(s -> hdrDeath.setQueue(s.toString()));
                     routingKeys.ifPresent(r -> {
                         var listR = (List<String>) r;
-                        hdrDeath.setRoutingKey(listR);
+                        hdrDeath.setRoutingKeys(listR);
                     });
                     time.ifPresent(d -> hdrDeath.setTime((Date) d));
 
@@ -57,24 +91,7 @@ public class RabbitmqHeader {
                 return xDeath.getCount();
             }
         }
-
         return 0;
-    }
-
-    public List<RabbitmqHeaderXDeath> getxDeaths() {
-        return xDeaths;
-    }
-
-    public String getxFirstDeathExchange() {
-        return xFirstDeathExchange;
-    }
-
-    public String getxFirstDeathQueue() {
-        return xFirstDeathQueue;
-    }
-
-    public String getxFirstDeathReason() {
-        return xFirstDeathReason;
     }
 
     public void setxDeaths(List<RabbitmqHeaderXDeath> xDeaths) {
@@ -92,6 +109,4 @@ public class RabbitmqHeader {
     public void setxFirstDeathReason(String xFirstDeathReason) {
         this.xFirstDeathReason = xFirstDeathReason;
     }
-
 }
-

@@ -113,7 +113,7 @@ public class Application implements CommandLineRunner {
 					"image-" + i,
 					types.get(new Random().nextInt(types.size())),
 					 sources.get(new Random().nextInt(sources.size())),
-					new Random().nextInt(10000)
+					new Random().nextInt(8000, 10000)
 			);
 			directExchangeRetryPictureProducer.sendMessage(picture);
 		}

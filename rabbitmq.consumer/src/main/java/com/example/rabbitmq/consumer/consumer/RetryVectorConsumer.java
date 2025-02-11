@@ -3,12 +3,14 @@ package com.example.rabbitmq.consumer.consumer;
 import java.io.IOException;
 
 import com.example.rabbitmq.consumer.model.Picture;
+import com.example.rabbitmq.consumer.rabbitmq.DlxProcessingErrorHandler;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.messaging.handler.annotation.Header;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -18,19 +20,13 @@ import com.rabbitmq.client.Channel;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class RetryVectorConsumer {
 
-    private static final String DEAD_EXCHANGE_NAME = "x.guideline.dead";
-
-    private static final Logger LOG = LoggerFactory.getLogger(RetryVectorConsumer.class);
-    private DlxProcessingErrorHandler dlxProcessingErrorHandler;
     private final ObjectMapper objectMapper;
-
-
-    @Autowired
-    public RetryVectorConsumer(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+    private final DlxProcessingErrorHandler dlxProcessingErrorHandler = new DlxProcessingErrorHandler(DEAD_EXCHANGE_NAME);;
+    private static final String DEAD_EXCHANGE_NAME = "x.guideline.dead";
+    private static final Logger LOG = LoggerFactory.getLogger(RetryVectorConsumer.class);
 
     @RabbitListener(queues = "q.guideline.vector.work")
     public void listen(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag)
