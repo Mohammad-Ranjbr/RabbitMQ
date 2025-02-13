@@ -24,9 +24,9 @@ import org.springframework.stereotype.Service;
 public class RetryVectorConsumer {
 
     private final ObjectMapper objectMapper;
-    private final DlxProcessingErrorHandler dlxProcessingErrorHandler = new DlxProcessingErrorHandler(DEAD_EXCHANGE_NAME);;
     private static final String DEAD_EXCHANGE_NAME = "x.guideline.dead";
-    private static final Logger LOG = LoggerFactory.getLogger(RetryVectorConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(RetryVectorConsumer.class);
+    private final DlxProcessingErrorHandler dlxProcessingErrorHandler = new DlxProcessingErrorHandler(DEAD_EXCHANGE_NAME);;
 
     @RabbitListener(queues = "q.guideline.vector.work")
     public void listen(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag)
@@ -36,14 +36,14 @@ public class RetryVectorConsumer {
             // process the image
             if (p.getSize() > 9000) {
                 // throw exception, we will use DLX handler for retry mechanism
-                throw new IOException("Size too large");
+                dlxProcessingErrorHandler.handleErrorProcessingMessage(message, channel, deliveryTag);
             } else {
-                LOG.info("Convert to image, creating thumbnail, & publishing : " + p);
+                logger.info("Convert to image, creating thumbnail, & publishing : " + p);
                 // you must acknowledge that message already processed
                 channel.basicAck(deliveryTag, false);
             }
         } catch (IOException e) {
-            LOG.warn("Error processing message : " + new String(message.getBody()) + " : " + e.getMessage());
+            logger.warn("Error processing message : " + new String(message.getBody()) + " : " + e.getMessage());
             dlxProcessingErrorHandler.handleErrorProcessingMessage(message, channel, deliveryTag);
         }
     }

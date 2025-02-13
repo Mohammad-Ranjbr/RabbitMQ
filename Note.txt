@@ -237,7 +237,7 @@ Example: In the previous scenario, we were processing images. Now suppose an ima
 If the Consumer gets an error while processing the message, RabbitMQ will put the message back in the Queue to be processed later.
 
 🔹 But what is the problem?
-If the message always causes an error (e.g. the image is too large and it throws an error every time it is processed), RabbitMQ will send the message over and over again, creating an infinite loop. 😱
+If the message always causes an error (e.g. the image is too large, and it throws an error every time it is processed), RabbitMQ will send the message over and over again, creating an infinite loop. 😱
 
 🔄 Solution: Dead Letter Exchange (DLX)
 🔹 If a message is processed multiple times and still has an error, we send it to a special queue called Dead Letter Queue (DLQ).
@@ -436,5 +436,57 @@ In this situation, the two previous approaches we learned are not enough:
 🔧 To do this:
 We create a special Retry queue that holds the message for 30 seconds.
 If the error is not fixed after 3 attempts, we send the message to the Dead Letter Exchange.
+
+🔹 Why is the Retry mechanism more complicated in Fan-out Exchange?
+In Fan-out Exchange, when a message is published, that message is sent to all queues connected to that Exchange.
+
+🔴 Main problem:
+
+Suppose we have two consumers:
+1️⃣ Accounting Consumer
+2️⃣ Marketing Consumer
+If the Accounting Consumer encounters an error and the message goes to the Wait queue, it will be sent to both consumers again when it comes back to the Work Exchange!
+But the Marketing Consumer had no problem and had processed it.
+Result: Marketing will process a duplicate message, which is wrong.
+✅ Solution:
+
+Instead of directly returning the message to the Work Exchange, we first send it to a Retry Exchange.
+Retry Exchange is a Direct Exchange, so we can use the Routing Key to route the message only to the desired queue.
+
+🔹 RabbitMQ Structure for Retry Mechanism
+📌 We have 4 Exchanges:
+
+1️⃣ Work Exchange (x.guideline2.work)
+Type: Fan-out
+All initial messages are published here.
+Connected to two queues:
+q.guideline2.accounting
+q.guideline2.marketing
+
+2️⃣ Wait Exchange (x.guideline2.wait)
+Type: Direct
+Invalid messages are first sent here to wait for some time (Time-to-Live or TTL).
+Dead Letter Exchange (DLX) is for q.guideline2.accounting.
+Messages are moved to Retry Exchange after TTL expires.
+
+3️⃣ Retry Exchange (x.guideline2.retry)
+Type: Direct
+This is used to resend invalid messages.
+Messages with a specified Routing Key are routed only to the desired queue.
+
+4️⃣ Dead Exchange (x.guideline2.dead)
+Type: Direct
+Messages that have exceeded the allowed retry limit are transferred here.
+Typically used for monitoring or error analysis.
+
+🔹 Overall Process
+1️⃣ Human Resource Producer sends messages to Work Exchange (Fan-out).
+2️⃣ The message is sent to both queues q.guideline2.accounting and q.guideline2.marketing.
+3️⃣ Marketing Consumer always processes the message, even if the employee name is null.
+4️⃣ Accounting Consumer sends the message to Wait Exchange if name == null.
+5️⃣ The message remains in Wait Queue until TTL expires.
+6️⃣ After TTL, the message is forwarded to Retry Exchange (Direct).
+7️⃣ Retry Exchange sends the message only to Accounting Queue with the specified Routing Key.
+8️⃣ If the message is still invalid after several Retries, it is forwarded to Dead Queue.
 
 
