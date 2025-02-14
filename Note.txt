@@ -497,4 +497,9 @@ Lazy Queue in RabbitMQ is a type of queue optimized for high message volumes tha
 ✅ Suitable for queues that have a lot of messages but their processing is not immediate.
 ✅ Messages remain on disk if RabbitMQ is restarted.
 
+When a message is not processed in the Work queue (due to an error or rejection),
+the message must be sent to the Dead Letter Exchange (x.guideline2.wait).
+Since x.guideline2.wait is a Direct Exchange, we need a Routing Key
+for this reason, we set the value of x-dead-letter-routing-key in the Work queue definition to specify which queue in x.guideline2.wait the message should be sent to.
+
 

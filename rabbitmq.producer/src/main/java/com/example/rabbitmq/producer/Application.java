@@ -120,10 +120,10 @@ public class Application implements CommandLineRunner {
 			//directExchangeRetryPictureProducer.sendMessage(picture);
 		//}
 
-		for(int i=0; i < 10 ; i++){
-			Employee employee = new Employee("Employee " + i, null, LocalDate.now());
-			retryEmployeeJsonProducer.sendMessage(employee);
-		}
+		//for(int i=0; i < 10 ; i++){
+			//Employee employee = new Employee("Employee " + i, null, LocalDate.now());
+			//retryEmployeeJsonProducer.sendMessage(employee);
+		//}
 
 	}
 
