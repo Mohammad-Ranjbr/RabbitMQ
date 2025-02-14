@@ -25,7 +25,7 @@ public class RetryImageConsumer {
     private static final Logger logger = LoggerFactory.getLogger(RetryImageConsumer.class);
     private final DlxProcessingErrorHandler dlxProcessingErrorHandler = new DlxProcessingErrorHandler(DEAD_EXCHANGE_NAME);
 
-    @RabbitListener(queues = "q.guideline.image.work")
+    //@RabbitListener(queues = "q.guideline.image.work")
     public void listen(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag)
             throws InterruptedException, IOException {
         try {

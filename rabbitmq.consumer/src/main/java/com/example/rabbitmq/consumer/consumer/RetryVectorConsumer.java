@@ -28,7 +28,7 @@ public class RetryVectorConsumer {
     private static final Logger logger = LoggerFactory.getLogger(RetryVectorConsumer.class);
     private final DlxProcessingErrorHandler dlxProcessingErrorHandler = new DlxProcessingErrorHandler(DEAD_EXCHANGE_NAME);;
 
-    @RabbitListener(queues = "q.guideline.vector.work")
+    //@RabbitListener(queues = "q.guideline.vector.work")
     public void listen(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag)
             throws InterruptedException, JsonParseException, JsonMappingException, IOException {
         try {

@@ -489,4 +489,12 @@ Typically used for monitoring or error analysis.
 7️⃣ Retry Exchange sends the message only to Accounting Queue with the specified Routing Key.
 8️⃣ If the message is still invalid after several Retries, it is forwarded to Dead Queue.
 
+Lazy Queue in RabbitMQ is a type of queue optimized for high message volumes that stores messages directly on disk to avoid excessive memory consumption.
+
+📌 Key features of Lazy Queue:
+✅ Messages are stored directly on disk and are only brought into memory when consumed.
+✅ Reduces RAM consumption on systems with a large number of messages.
+✅ Suitable for queues that have a lot of messages but their processing is not immediate.
+✅ Messages remain on disk if RabbitMQ is restarted.
+
 
