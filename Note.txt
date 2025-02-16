@@ -539,3 +539,15 @@ Copying the plugin into the container :
 
 Activate the plugin :
             -- rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+
+1. What is the Retry mechanism?
+In distributed systems, some requests may fail due to reasons such as network outages, long processing, or system problems. The Retry mechanism helps us to retry the processing in case of an error.
+Spring Boot supports this mechanism internally, so we don't need to write additional code to handle errors and resend messages, and we only enable this feature with settings in application.properties.
+
+📌 RabbitMQ structure in this system:
+x.spring.work: A Direct Exchange for sending image messages.
+queue.spring.image.work: A queue for processing images (JPEG/PNG).
+queue.spring.vector.work: A queue for processing vector images (SVG).
+x.spring.dead: A Dead Letter Exchange for failed messages.
+
+

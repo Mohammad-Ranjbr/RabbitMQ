@@ -20,7 +20,7 @@ public class ReportRequestConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = "q.delayed")
+    //@RabbitListener(queues = "q.delayed")
     public void listen(String message) throws JsonProcessingException {
         ReportRequest reportRequest = objectMapper.readValue(message, ReportRequest.class);
         logger.info("On repost request {}", reportRequest);

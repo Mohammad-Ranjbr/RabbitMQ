@@ -40,6 +40,7 @@ public class Application implements CommandLineRunner {
 	private final DirectExchangeRetryPictureProducer directExchangeRetryPictureProducer;
 	private final RetryEmployeeJsonProducer retryEmployeeJsonProducer;
 	private final ReportRequestProducer reportRequestProducer;
+	private final SpringPictureProducer springPictureProducer;
 
 	@Override
 	public void run(String... args) throws JsonProcessingException {
@@ -133,6 +134,19 @@ public class Application implements CommandLineRunner {
 			//reportRequest.setLarge(i % 2 == 0);
 			//reportRequestProducer.sendMessage(reportRequest);
 		//}
+
+		List<String> sources = Arrays.asList("mobile", "web");
+		List<String> types = Arrays.asList("png", "svg");
+
+		for (int i = 1; i <= 2; i++) {
+			Picture picture = new Picture(
+					"image-" + i,
+					types.get(new Random().nextInt(types.size())),
+					sources.get(new Random().nextInt(sources.size())),
+					new Random().nextInt(9000,10000)
+			);
+			springPictureProducer.sendMessage(picture);
+		}
 
 	}
 
