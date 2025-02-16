@@ -127,12 +127,12 @@ public class Application implements CommandLineRunner {
 			//retryEmployeeJsonProducer.sendMessage(employee);
 		//}
 
-		for(int i=0 ; i<4 ; i++){
-			ReportRequest reportRequest = new ReportRequest();
-			reportRequest.setReportName("Report " + i);
-			reportRequest.setLarge(i % 2 == 0);
-			reportRequestProducer.sendMessage(reportRequest);
-		}
+		//for(int i=0 ; i<4 ; i++){
+			//ReportRequest reportRequest = new ReportRequest();
+			//reportRequest.setReportName("Report " + i);
+			//reportRequest.setLarge(i % 2 == 0);
+			//reportRequestProducer.sendMessage(reportRequest);
+		//}
 
 	}
 
