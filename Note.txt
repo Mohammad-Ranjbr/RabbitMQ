@@ -502,4 +502,16 @@ the message must be sent to the Dead Letter Exchange (x.guideline2.wait).
 Since x.guideline2.wait is a Direct Exchange, we need a Routing Key
 for this reason, we set the value of x-dead-letter-routing-key in the Work queue definition to specify which queue in x.guideline2.wait the message should be sent to.
 
+Entering the RabbitMQ container :
+            -- docker exec -it rabbitmq bash
+
+List of plugins :
+            -- rabbitmq-plugins list
+
+Activate the plugin :
+            -- rabbitmq-plugins enable rabbitmq_shovel
+
+Deactivate the plugin :
+            -- rabbitmq-plugins disable rabbitmq_shovel
+
 
