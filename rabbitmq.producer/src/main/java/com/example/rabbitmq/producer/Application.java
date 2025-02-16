@@ -41,6 +41,7 @@ public class Application implements CommandLineRunner {
 	private final RetryEmployeeJsonProducer retryEmployeeJsonProducer;
 	private final ReportRequestProducer reportRequestProducer;
 	private final SpringPictureProducer springPictureProducer;
+	private final SpringEmployeeJsonProducer springEmployeeJsonProducer;
 
 	@Override
 	public void run(String... args) throws JsonProcessingException {
@@ -135,18 +136,21 @@ public class Application implements CommandLineRunner {
 			//reportRequestProducer.sendMessage(reportRequest);
 		//}
 
-		List<String> sources = Arrays.asList("mobile", "web");
-		List<String> types = Arrays.asList("png", "svg");
+		//List<String> sources = Arrays.asList("mobile", "web");
+		//List<String> types = Arrays.asList("png", "svg");
 
-		for (int i = 1; i <= 2; i++) {
-			Picture picture = new Picture(
-					"image-" + i,
-					types.get(new Random().nextInt(types.size())),
-					sources.get(new Random().nextInt(sources.size())),
-					new Random().nextInt(9000,10000)
-			);
-			springPictureProducer.sendMessage(picture);
-		}
+		//for (int i = 1; i <= 2; i++) {
+			//Picture picture = new Picture(
+					//"image-" + i,
+					//types.get(new Random().nextInt(types.size())),
+					//sources.get(new Random().nextInt(sources.size())),
+					//new Random().nextInt(9000,10000)
+			//);
+			//springPictureProducer.sendMessage(picture);
+		//}
+
+		Employee employee = new Employee("emp-string", null, LocalDate.now());
+		springEmployeeJsonProducer.sendMessage(employee);
 
 	}
 

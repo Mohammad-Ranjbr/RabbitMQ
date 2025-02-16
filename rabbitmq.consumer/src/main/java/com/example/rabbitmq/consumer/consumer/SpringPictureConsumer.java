@@ -22,7 +22,7 @@ public class SpringPictureConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = "q.spring.image.work")
+    //@RabbitListener(queues = "q.spring.image.work")
     public void listenImage(String message) throws IOException {
         Picture picture = objectMapper.readValue(message, Picture.class);
         logger.info("Consuming image : {}", picture);
@@ -32,7 +32,7 @@ public class SpringPictureConsumer {
         logger.info("Processing image : " + picture);
     }
 
-    @RabbitListener(queues = "q.spring.vector.work")
+    //@RabbitListener(queues = "q.spring.vector.work")
     public void listenVector(String message) throws JsonProcessingException {
         Picture picture = objectMapper.readValue(message, Picture.class);
         logger.info("Consuming vector : {}", picture);
