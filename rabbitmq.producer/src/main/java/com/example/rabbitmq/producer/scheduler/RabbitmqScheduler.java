@@ -21,15 +21,15 @@ public class RabbitmqScheduler {
         this.rabbitmqClient = rabbitmqClient;
     }
 
-    @Scheduled(fixedDelay = 90000)
-    public void sweepDirtyQueues(){
-        try{
-            List<RabbitmqQueue> dirtyQueues = rabbitmqClient.getAllQueues().stream().filter(RabbitmqQueue::isDirty)
-                    .toList();
-            dirtyQueues.forEach(q -> logger.info("Queue {} has {} unprocessed messages.", q.getName(), q.getMessages()));
-        } catch (Exception exception){
-            logger.warn("Cannot sweep queues : " + exception.getMessage());
-        }
-    }
+//    @Scheduled(fixedDelay = 90000)
+//    public void sweepDirtyQueues(){
+//        try{
+//            List<RabbitmqQueue> dirtyQueues = rabbitmqClient.getAllQueues().stream().filter(RabbitmqQueue::isDirty)
+//                    .toList();
+//            dirtyQueues.forEach(q -> logger.info("Queue {} has {} unprocessed messages.", q.getName(), q.getMessages()));
+//        } catch (Exception exception){
+//            logger.warn("Cannot sweep queues : " + exception.getMessage());
+//        }
+//    }
 
 }

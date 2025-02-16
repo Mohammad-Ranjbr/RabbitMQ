@@ -28,7 +28,7 @@ public class RetryAccountingConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = "q.guideline2.accounting.work")
+    //@RabbitListener(queues = "q.guideline2.accounting.work")
     public void listen(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag)
             throws IOException {
         try {

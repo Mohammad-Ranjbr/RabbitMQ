@@ -3,6 +3,7 @@ package com.example.rabbitmq.producer;
 import com.example.rabbitmq.producer.model.Employee;
 import com.example.rabbitmq.producer.model.Furniture;
 import com.example.rabbitmq.producer.model.Picture;
+import com.example.rabbitmq.producer.model.ReportRequest;
 import com.example.rabbitmq.producer.producer.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class Application implements CommandLineRunner {
 	private final FurnitureProducer furnitureProducer;
 	private final DirectExchangeRetryPictureProducer directExchangeRetryPictureProducer;
 	private final RetryEmployeeJsonProducer retryEmployeeJsonProducer;
+	private final ReportRequestProducer reportRequestProducer;
 
 	@Override
 	public void run(String... args) throws JsonProcessingException {
@@ -124,6 +126,13 @@ public class Application implements CommandLineRunner {
 			//Employee employee = new Employee("Employee " + i, null, LocalDate.now());
 			//retryEmployeeJsonProducer.sendMessage(employee);
 		//}
+
+		for(int i=0 ; i<4 ; i++){
+			ReportRequest reportRequest = new ReportRequest();
+			reportRequest.setReportName("Report " + i);
+			reportRequest.setLarge(i % 2 == 0);
+			reportRequestProducer.sendMessage(reportRequest);
+		}
 
 	}
 

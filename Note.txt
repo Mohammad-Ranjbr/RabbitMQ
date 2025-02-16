@@ -514,4 +514,28 @@ Activate the plugin :
 Deactivate the plugin :
             -- rabbitmq-plugins disable rabbitmq_shovel
 
+🎯 Why should we send messages with a delay?
+Suppose we have a system that generates heavy reports.
+✅ Problem: If these reports are generated during office hours, the system speed will slow down and its performance will drop.
+✅ Solution: It is better to send these reports after 7 pm so that they do not affect the daily performance of the system.
+But the problem is that RabbitMQ does not support delayed message sending by default!
+☑ But there is a solution: the "Delayed Message" plugin 🚀
 
+📌 How to add the delayed message sending feature to RabbitMQ?
+1. Install the "Delayed Message" plugin
+2. Create a special Exchange that holds messages until the delay time has passed
+
+Entering the RabbitMQ container :
+            -- docker exec -it rabbitmq bash
+
+Finding the path to plugins :
+            -- rabbitmq-plugins directories -s
+
+Copy Plugin archives directory path
+Download rabbitmq_delayed_message_exchange plugin
+
+Copying the plugin into the container :
+            -- docker cp /home/pc1/Downloads/rabbitmq_delayed_message_exchange-4.0.2.ez rabbitmq:/opt/rabbitmq/plugins
+
+Activate the plugin :
+            -- rabbitmq-plugins enable rabbitmq_delayed_message_exchange
