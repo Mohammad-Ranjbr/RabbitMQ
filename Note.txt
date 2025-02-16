@@ -550,4 +550,26 @@ queue.spring.image.work: A queue for processing images (JPEG/PNG).
 queue.spring.vector.work: A queue for processing vector images (SVG).
 x.spring.dead: A Dead Letter Exchange for failed messages.
 
+We have a queue (queue) that processes messages one by one.
+Now suppose we have three messages:
+1️⃣ Message A
+2️⃣ Message B
+3️⃣ Message C
+The messages enter the queue in order. But this is where the problem arises if the message is corrupted and an error occurs! 😲
+Why?
+Because Spring Retry comes and tries several times to reprocess the message.
+When these searches are unsuccessful, the next messages (B and C) are not processed and wait in the queue.
+
+✅ What can we do to solve this problem?
+If you don't want the queue to stop, instead of keeping the message in the same queue and retrying, you can send it somewhere else!
+1️⃣ Dead Letter Queue (DLQ) method
+📤 If the message is corrupted, send it directly to a separate queue (DLQ) to be checked later.
+✅ This way, messages B and C are processed quickly and do not stop.
+2️⃣ Parallel Consumers Method
+🛠 Instead of having just one processor, we have several simultaneous consumers.
+✅ This way, if message A gets stuck, processing of messages B and C continues.
+3️⃣ Delay Queue Method
+⏳ If message A has a problem, instead of retrying it right away, we send it to a queue to try again later.
+✅ This way, healthy messages (B and C) do not get stuck.
+
 
